@@ -1,0 +1,35 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model Customer {
+  id         Int      @id @default(autoincrement())
+  name       String
+  cast       String
+  address    String?
+  village    String?
+  phone      Int?
+  fatherName String?
+  neighbour  String?
+  rating     String?
+  extra      String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([name])
+  @@index([cast])
+  @@index([village])
+  @@index([phone])
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+}
