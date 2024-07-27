@@ -36,3 +36,16 @@ model Item {
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
 }
+
+model Entry {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId],references:[id])
+  itemId      Int?      
+  item        Item     @relation(fields: [itemId],references:[id])
+  totalItem   Int      @default(0)
+  returnCount Int      @default(0)
+  value       Int      @default(0)      
+  cash        Int      @default(0)
+  pickedBy    String?      
+}
