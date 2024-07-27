@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
-import {createUser} from "@/lib/queries";
+import {findUser,createUser} from "@/lib/queries";
+import { useEffect } from "react"
 
 const formSchema = z.object({
 //   id: z.string().optional().or(z.literal('')),
@@ -30,33 +30,36 @@ const formSchema = z.object({
   village:z.string().min(3, {
     message: "village must be at least 3 characters.",
   }).optional().or(z.literal('')),
-  phone: z.string().min(10).max(10).optional().or(z.literal('')),
+  phone: z.number().min(10).max(10).optional().or(z.literal(0)),
   fatherName:z.string().min(3, {
     message: "fatherName must be at least 3 characters.",
   }).optional().or(z.literal('')),
   neighbour:z.string().min(3, {
     message: "neighbour must be at least 3 characters.",
   }).optional().or(z.literal('')),
-  rating:z.string().min(1, {
+  rating:z.number().min(-1, {
     message: "rating must be at least 1 characters.",
-  }).optional().or(z.literal('')),
+  }).max(9).optional().or(z.literal('')),
   extra:z.string().min(3, {
     message: "extra must be at least 3 characters.",
   }).optional().or(z.literal('')),
 })
 
-export default function ProfileForm() {
+export default function UserForm(props:{id?:number}) {
+    // const [isloading,setL]
+    const {id} = props;
     const defaultValues = { 
         name: "",
         cast:"",
         address:"",
         village:"",
-        Phone:"",
+        phone:0,
         fatherName:"",
         neighbour:"",
-        rating:"",
+        rating:-1,
         extra:""
     }
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues
@@ -73,9 +76,52 @@ export default function ProfileForm() {
         console.log(response)
       }
 
+    useEffect(()=>{
+        const fetchData=async()=>{
+            if(id){
+                try{
+                    console.log('id : ',typeof id);
+                    const response = await findUser(id);
+                    // console.log("response : ",response);
+                    if(response && response.name){
+                        const {
+                            name, 
+                            cast,
+                            address,
+                            village,
+                            phone,
+                            fatherName,
+                            neighbour,
+                            rating,
+                            extra,
+                        } = response;
+                        defaultValues.name= name ? name :'';
+                        defaultValues.cast= cast ? cast :'';
+                        defaultValues.address= address ? address :'';
+                        defaultValues.village= village ? village :'';
+                        defaultValues.phone= phone ? phone : 0;
+                        defaultValues.fatherName= fatherName ? fatherName :'';
+                        defaultValues.neighbour= neighbour ? neighbour :'';
+                        defaultValues.rating= rating ? rating :0;
+                        defaultValues.extra= extra ? extra :'';
+                        form.reset(defaultValues);
+                    }
+                }
+                catch(e){
+                    console.log(e)
+                }
+            }
+        }
+
+        fetchData();
+    },[id]);
+
+
+
+
   return (
     <div className="flex flex-col items-center py-4">
-        <h1 className="py-4"> ग्राहक जोड़े </h1>
+        <h1 className="py-4"> {id ?  defaultValues.name + " ग्राहक" : "ग्राहक जोड़े"} </h1>
         <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
             <FormField
@@ -99,7 +145,7 @@ export default function ProfileForm() {
             name="cast"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Cast</FormLabel>
+                <FormLabel>जाती</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -112,7 +158,7 @@ export default function ProfileForm() {
             name="address"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>पता</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -125,7 +171,7 @@ export default function ProfileForm() {
             name="village"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Village</FormLabel>
+                <FormLabel>गाँव</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -138,7 +184,7 @@ export default function ProfileForm() {
             name="phone"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>फ़ोन</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -151,7 +197,7 @@ export default function ProfileForm() {
             name="fatherName"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Father Name</FormLabel>
+                <FormLabel>बेटा</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -199,7 +245,7 @@ export default function ProfileForm() {
             )}
             />
 
-            <Button type="submit" size="lg">Submit</Button>
+            <Button type="submit" size="lg">जोड़े</Button>
         </form>
         </Form>
     </div>

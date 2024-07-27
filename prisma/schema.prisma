@@ -4,8 +4,11 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
 
-model Customer {
+model User {
   id         Int      @id @default(autoincrement())
   name       String
   cast       String
@@ -14,10 +17,10 @@ model Customer {
   phone      Int?
   fatherName String?
   neighbour  String?
-  rating     String?
+  rating     Int?
   extra      String?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  createdAt        DateTime?              @default(now())
+  updatedAt        DateTime?              @updatedAt
 
   @@index([name])
   @@index([cast])
