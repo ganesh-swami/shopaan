@@ -34,6 +34,22 @@ export const findUser = async (id: number) => {
     }
 } 
 
+export const updateUser = async (id:number,values: User) => {
+    try {
+        const res = await db.user.update({
+            where: {
+                id: id
+            },
+            //@ts-ignore
+            data:values
+        })
+        return res
+    }
+    catch (e) {
+        console.log(e)
+    }
+}
+
 export const getUsers = async () => {
     try {
         const res = await db.user.findMany()

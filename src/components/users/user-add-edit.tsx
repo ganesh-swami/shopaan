@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
-import {findUser,createUser} from "@/lib/queries";
+import {findUser,createUser,updateUser} from "@/lib/queries";
 import { useEffect } from "react"
 
 const formSchema = z.object({
@@ -56,7 +56,7 @@ export default function UserForm(props:{id?:number}) {
         phone:0,
         fatherName:"",
         neighbour:"",
-        rating:-1,
+        rating:0,
         extra:""
     }
 
@@ -71,9 +71,14 @@ export default function UserForm(props:{id?:number}) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
 
-        //@ts-ignore
-        const response = await createUser(values);
-        console.log(response)
+        if(id){
+            //@ts-ignore
+            await updateUser(id,values);
+        }
+        else{
+            //@ts-ignore
+            const response = await createUser(values);
+        }
       }
 
     useEffect(()=>{
@@ -102,6 +107,7 @@ export default function UserForm(props:{id?:number}) {
                         defaultValues.phone= phone ? phone : 0;
                         defaultValues.fatherName= fatherName ? fatherName :'';
                         defaultValues.neighbour= neighbour ? neighbour :'';
+                        //@ts-ignore
                         defaultValues.rating= rating ? rating :0;
                         defaultValues.extra= extra ? extra :'';
                         form.reset(defaultValues);
@@ -145,7 +151,7 @@ export default function UserForm(props:{id?:number}) {
             name="cast"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>जाती</FormLabel>
+                <FormLabel>जाति</FormLabel>
                 <FormControl>
                     <Input placeholder="" {...field} />
                 </FormControl>
@@ -186,7 +192,7 @@ export default function UserForm(props:{id?:number}) {
                 <FormItem>
                 <FormLabel>फ़ोन</FormLabel>
                 <FormControl>
-                    <Input placeholder="" {...field} />
+                    <Input type="tel" placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -238,7 +244,7 @@ export default function UserForm(props:{id?:number}) {
                 <FormItem>
                 <FormLabel>रेटिंग</FormLabel>
                 <FormControl>
-                    <Input placeholder="" {...field} />
+                    <Input type="number" placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
