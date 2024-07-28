@@ -4,16 +4,22 @@ import { useRouter } from 'next/router';
 // import { EntryForm } from '@/components/entry-from';
 import { Button } from '@/components/ui/button';
 
-interface Entry {
-  id: number;
-  userId: number;
-  itemId?: number;
-  totalItem: number;
-  returnCount: number;
-  value: number;
-  cash: number;
-  pickedBy?: string;
-}
+import {
+  Entry,
+  Item,
+  User
+} from '@prisma/client'
+
+// interface Entry {
+//   id: number;
+//   userId: number;
+//   itemId?: number;
+//   totalItem: number;
+//   returnCount: number;
+//   value: number;
+//   cash: number;
+//   pickedBy?: string;
+// }
 
 export default function  AddEntryPage () {
 //   const [isAdding, setIsAdding] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { EntryForm } from '@/components/entry-from';
+import { EntryForm } from '@/components/entry/entry-from';
 import { Button } from '@/components/ui/button';
 
 interface Entry {

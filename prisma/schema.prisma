@@ -19,6 +19,7 @@ model User {
   neighbour  String?
   rating     Int?
   extra      String?
+  entry       Entry[]
   createdAt        DateTime?              @default(now())
   updatedAt        DateTime?              @updatedAt
 
@@ -33,6 +34,7 @@ model Item {
   name        String
   description String?
   price       Int
+  entry       Entry[]
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
 }
@@ -42,7 +44,7 @@ model Entry {
   userId      Int
   user        User     @relation(fields: [userId],references:[id])
   itemId      Int?      
-  item        Item     @relation(fields: [itemId],references:[id])
+  item        Item?     @relation(fields: [itemId],references:[id])
   totalItem   Int      @default(0)
   returnCount Int      @default(0)
   value       Int      @default(0)      
