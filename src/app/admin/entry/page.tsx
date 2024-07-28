@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {getUsers} from "@/lib/queries";
+import { useSearchParams } from 'next/navigation'
+import {getEntries,getUserEntries} from "@/lib/queries";
 import {
     Entry,
     User,
@@ -15,20 +16,34 @@ import { Button } from "@/components/ui/button";
 
 export default function Entries () {
     const router = useRouter();
+    
+    const searchParams = useSearchParams()
+ 
+    const page = searchParams.get('page')
+    const userid = searchParams.get('userid')
     const [entry,setEntry]=useState<Entry[]>([]);
 
     useEffect(() => {
+        
         const fetchUsers = async () => {
-            const allUsers = await getUsers();
-            if(allUsers && allUsers.length>0) setUsers(allUsers);
+            if(userid && userid!==''){
+                const entries = await getUserEntries(parseInt(userid));
+                if(entries && entries.length>0) setEntry(entries);
+            }
+            else{
+                let curentPage = page ? parseInt(page) : 1;
+                const entries = await getEntries(curentPage);
+                if(entries && entries.length>0) setEntry(entries);
+            }
+            
         }
         fetchUsers();
 
-    },[])
+    },[page,userid])
 
     const handleClick =()=>{
         console.log("clicked")
-        router.push('/admin/user/add');
+        router.push('/admin/entry/add');
     }
    
     return (
@@ -37,7 +52,7 @@ export default function Entries () {
                 <h1 className="py-4"> ग्राहक </h1>
                 <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button>
             </div>
-            <DataTable columns={columns} data={users} />
+            <DataTable columns={columns} data={entry} />
         </div>
     )
 }

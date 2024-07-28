@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import {User} from '@prisma/client'
+import {Entry} from '@prisma/client'
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import { Button } from "../ui/button"
 
@@ -10,7 +10,7 @@ import { Button } from "../ui/button"
 // You can use a Zod schema here if you want.
 
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Entry>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {

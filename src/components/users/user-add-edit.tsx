@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
-import {findUser,createUser,updateUser} from "@/lib/queries";
+import {getUser,createUser,updateUser} from "@/lib/queries";
 import { useEffect } from "react"
 
 const formSchema = z.object({
@@ -86,7 +86,7 @@ export default function UserForm(props:{id?:number}) {
             if(id){
                 try{
                     console.log('id : ',typeof id);
-                    const response = await findUser(id);
+                    const response = await getUser(id);
                     // console.log("response : ",response);
                     if(response && response.name){
                         const {

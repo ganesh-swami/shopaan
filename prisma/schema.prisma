@@ -8,6 +8,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
+enum STATUS {
+  ACTIVE
+  DONE
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   name       String
@@ -44,10 +50,14 @@ model Entry {
   userId      Int
   user        User     @relation(fields: [userId],references:[id])
   itemId      Int?      
-  item        Item?     @relation(fields: [itemId],references:[id])
+  item        Item?    @relation(fields: [itemId],references:[id])
   totalItem   Int      @default(0)
   returnCount Int      @default(0)
   value       Int      @default(0)      
   cash        Int      @default(0)
-  pickedBy    String?      
+  pickedBy    String?
+  status      STATUS   @default(ACTIVE)
+
+  @@index([userId])
+  @@index([status])
 }
