@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { useSession, SessionProvider } from 'next-auth/react';
+import { Toaster } from "@/components/ui/sonner"
 import AuthChecker from "./authchecker";
 import "./../globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             </AuthChecker>
         </SessionProvider>  
         </div>  
+        <Toaster richColors position="top-right" />
     </body>
     </html>
   );

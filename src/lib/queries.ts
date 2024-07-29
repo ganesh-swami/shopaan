@@ -68,6 +68,10 @@ export const getEntries = async (page:number) => {
             take: 50,
             where: {
                 status: "ACTIVE"
+            },
+            include: {
+                item: true,
+                user: true,
             }
         })
         return res
@@ -82,6 +86,10 @@ export const getUserEntries = async (userId:number) => {
         const res = await db.entry.findMany({
             where: {
                 userId: userId
+            },
+            include: {
+                item: true,
+                user: true,
             }
         })
         return res
@@ -123,13 +131,16 @@ export const updateEntry = async (id:number, values: Entry) => {
 
 export const createEntry = async (values: Entry) => {
     try {
+
         const res = await db.entry.create({
             data:values
         })
+        //console.log("======================",res);
         return res
     }
     catch (e) {
         console.log(e)
+        return null;
     }
 }
 

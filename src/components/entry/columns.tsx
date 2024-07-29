@@ -12,6 +12,20 @@ import { Button } from "../ui/button"
 
 export const columns: ColumnDef<Entry>[] = [
   {
+    accessorKey: "customerName",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            ग्राहक 
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+    },
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => {
         return (
@@ -26,60 +40,70 @@ export const columns: ColumnDef<Entry>[] = [
     },
   },
   {
-    accessorKey: "cast",
+    accessorKey: "totalItem",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            जाति
+            नग
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
     },
   },
   {
-    accessorKey: "address",
+    accessorKey: "cash",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            पता
+            जमा
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
     },
   },
   {
-    accessorKey: "village",
+    accessorKey: "due",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            गाँव
+            बकाया 
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
     },
   },
   {
-    accessorKey: "fatherName",
-    header: "बेटा",
-  },
-  {
-    accessorKey: "phone",
+    accessorKey: "value",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            फ़ोन
+            कुल 
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            तारीख 
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )

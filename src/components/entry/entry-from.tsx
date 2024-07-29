@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner"
 import {
   Form,
   FormControl,
@@ -23,14 +24,15 @@ import {
   Entry
 } from '@prisma/client'
 import MyLoader from "@/components/ui/loader";
+import { updateEntry, createEntry} from "@/lib/queries"
 
 const formSchema = z.object({
   userId: z.number().min(1, "User ID is required."),
   itemId: z.number().optional().or(z.literal(0)),
-  totalItem: z.number().min(0, "Total items must be 0 or more."),
-  returnCount: z.number().min(0, "Return count must be 0 or more."),
-  value: z.number().min(0, "Value must be 0 or more."),
-  cash: z.number().min(0, "Cash must be 0 or more."),
+  totalItem: z.string().min(1, "Total items must be 0 or more."),
+  returnCount: z.string().min(1, "Return count must be 0 or more."),
+  value: z.string().min(1, "Value must be 0 or more."),
+  cash: z.string().min(1, "Cash must be 0 or more."),
   pickedBy: z.string().optional(),
 });
 
@@ -39,19 +41,30 @@ type EntryFormProps = {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
 };
 
+type defaultValues = {
+  userId:number|undefined,
+  itemId:number|undefined,
+  totalItem:number|undefined,
+  returnCount:number|undefined,
+  value:number|undefined,
+  cash:number,
+  pickedBy:string,
+}
+
 export function EntryForm(props:{userId:number, id?:number}) {
   const {userId,id} = props;
 
   const [items,setItems]= useState<Item[]>();
   const [user,setUser]= useState<User>();
+  const [isSaving,setIsSaving]=useState<boolean>();
 
   const defaultValues = {
     userId:0,
     itemId:0,
-    totalItem:0,
-    returnCount:0,
-    value:0,
-    cash:0,
+    totalItem:'0',
+    returnCount:'0',
+    value:'0',
+    cash:'0',
     pickedBy:"",
   }
   const form = useForm({
@@ -64,6 +77,7 @@ export function EntryForm(props:{userId:number, id?:number}) {
         try{
             console.log('id : ',typeof id);
             let response:any = null;
+            form.setValue('userId',userId);
             if(id){
               response= await getEntryDetails(userId,id);
             }
@@ -74,6 +88,7 @@ export function EntryForm(props:{userId:number, id?:number}) {
             if(response){
                 setItems(response.items);
                 setUser(response.user);
+                form.setValue('itemId',response.items[0].id);
 
                 if(response.entry){
                     const {
@@ -84,13 +99,22 @@ export function EntryForm(props:{userId:number, id?:number}) {
                         cash,
                         pickedBy,
                     } = response.entry;
-                    defaultValues.itemId= itemId ? itemId :0;
-                    defaultValues.totalItem= totalItem ? totalItem :0;
-                    defaultValues.returnCount= returnCount ? returnCount :0;
-                    defaultValues.value= value ? value :0;
-                    defaultValues.cash= cash ? cash :0;
-                    defaultValues.pickedBy= pickedBy ? pickedBy :'';
-                    form.reset(defaultValues);
+                    form.reset({
+                      userId: userId,
+                      itemId: itemId || 0,
+                      totalItem: totalItem || 0,
+                      returnCount: returnCount || 0,
+                      value: value || 0,
+                      cash: cash || 0,
+                      pickedBy: pickedBy || ''
+                    });
+                    // defaultValues.itemId= itemId ? itemId :0;
+                    // defaultValues.totalItem= totalItem ? totalItem :0;
+                    // defaultValues.returnCount= returnCount ? returnCount :0;
+                    // defaultValues.value= value ? value :0;
+                    // defaultValues.cash= cash ? cash :0;
+                    // defaultValues.pickedBy= pickedBy ? pickedBy :'';
+                    // form.reset(defaultValues);
                 }
 
             }
@@ -112,18 +136,72 @@ useEffect(()=>{
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSaving(true);
     console.log("values : ",values);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
+    const finalData ={
+        ...values,
+        itemId:parseInt(values.itemId+""),
+        totalItem:parseInt(values.totalItem+""),
+        returnCount:parseInt(values.returnCount+""),
+        value:parseInt(values.value+""),
+        cash:parseInt(values.cash+""),
+    }
+    
     if(id){
         //@ts-ignore
-        await updateUser(id,{...values,userId:userId});
+        const resp = await updateEntry(id,finalData);
+        console.log('resp', resp);
+        if(resp) {
+          toast.success("Entry updated successfully");
+        }
+        else {
+          toast.error("Error in updating");
+          setIsSaving(false);
+        }
     }
     else{
         //@ts-ignore
-        const response = await createUser(values);
+        const resp = await createEntry(finalData);
+        console.log('resp', resp);
+        if(resp) {toast.success("Entry created successfully");}
+        else {
+          toast.error("Error in creating");
+          setIsSaving(false);
+        }
     }
+  }
+  const itemUpdateValue=(value:string)=>{
+    console.log('calling ..................',value);
+    form.setValue('itemId', parseInt(value));
+    updateValue()
+  }
+  const countUpdateValue=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    form.setValue('totalItem', e.target.value);
+    updateValue()
+  }
+  const updateValue =()=>{
+    
+    const totalItem = parseInt(form.getValues('totalItem'));
+    const returnCount = parseInt(form.getValues('returnCount') || '0');
+    let itemId = form.getValues('itemId');
+     if(items && !itemId){
+       itemId = items[0].id;
+      // form.setValue('itemId', itemId);
+    }
+    console.log('totalItem', totalItem, 'returnCount', returnCount, 'itemId', itemId);
+    if(totalItem && returnCount>=0 && itemId){
+        const remainingItem = totalItem - returnCount;
+        const item = items?.find((item)=>item.id == itemId);
+        if(item){
+            const value = remainingItem * item.price;
+            console.log('value',value);
+            form.setValue('value', value+"");
+        }
+    }
+    return
   }
 
   return (
@@ -139,7 +217,7 @@ useEffect(()=>{
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <RadioGroup defaultValue={items[0].id ? items[0].id+'': undefined}>
+                      <RadioGroup defaultValue={items[0].id ? items[0].id+'': undefined} onValueChange={(e)=>{itemUpdateValue(e)}}>
                         {items.map((item)=>{
                           return (
                           <div key={item.id} className="flex items-center space-x-2">
@@ -161,7 +239,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>नग</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Enter total items" {...field} />
+                      <Input type="number" placeholder="Enter total items" {...field} onChange={(e)=>{countUpdateValue(e)}}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -180,7 +258,8 @@ useEffect(()=>{
                     <FormMessage />
                   </FormItem>
                 )}
-              />: null}
+              />
+               : null}
               <FormField
                 control={form.control}
                 name="value"
@@ -188,7 +267,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>रूपए</FormLabel>
                     <FormControl>
-                      <Input type="number" disabled placeholder="Enter value" {...field} />
+                      <Input type="number" placeholder="Enter value" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -220,11 +299,11 @@ useEffect(()=>{
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg">Submit</Button>
+              <Button type="submit" className='my-4'  size="lg">{isSaving ? <MyLoader size='sm'/> : "सेव करे" }</Button>
             </form>
           </Form>
         </>
-        : <MyLoader/> }
+        : <MyLoader /> }
     </div>
 
     

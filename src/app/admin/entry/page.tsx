@@ -23,17 +23,22 @@ export default function Entries () {
     const userid = searchParams.get('userid')
     const [entry,setEntry]=useState<Entry[]>([]);
 
+
+    const setEntries = (entries:Entry[])=>{
+        setEntry(entries);
+    }
+
     useEffect(() => {
         
         const fetchUsers = async () => {
             if(userid && userid!==''){
                 const entries = await getUserEntries(parseInt(userid));
-                if(entries && entries.length>0) setEntry(entries);
+                if(entries && entries.length>0) setEntries(entries);
             }
             else{
                 let curentPage = page ? parseInt(page) : 1;
                 const entries = await getEntries(curentPage);
-                if(entries && entries.length>0) setEntry(entries);
+                if(entries && entries.length>0) setEntries(entries);
             }
             
         }
@@ -53,6 +58,7 @@ export default function Entries () {
                 <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button>
             </div>
             <DataTable columns={columns} data={entry} />
+
         </div>
     )
 }
