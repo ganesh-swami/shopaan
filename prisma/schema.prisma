@@ -26,7 +26,7 @@ model User {
   rating     Int?
   extra      String?
   entry       Entry[]
-  createdAt        DateTime?              @default(now())
+  createdAt        DateTime              @default(now())
   updatedAt        DateTime?              @updatedAt
 
   @@index([name])
@@ -42,7 +42,7 @@ model Item {
   price       Int
   entry       Entry[]
   createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  updatedAt        DateTime?              @updatedAt
 }
 
 model Entry {
@@ -57,6 +57,8 @@ model Entry {
   cash        Int      @default(0)
   pickedBy    String?
   status      STATUS   @default(ACTIVE)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime?             @updatedAt
 
   @@index([userId])
   @@index([status])

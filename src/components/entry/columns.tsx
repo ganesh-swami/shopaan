@@ -1,16 +1,23 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import {Entry} from '@prisma/client'
+import {Entry,User, Item} from '@prisma/client'
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import { Button } from "../ui/button"
+import { Interface } from "readline"
 
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
+interface Entries extends Entry {
+  user: User,
+  item: Item
+}
 
-export const columns: ColumnDef<Entry>[] = [
+
+
+export const columns: ColumnDef<Entries>[] = [
   {
     accessorKey: "customerName",
     header: ({ column }) => {
@@ -18,39 +25,67 @@ export const columns: ColumnDef<Entry>[] = [
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
           >
-            ग्राहक 
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            ग्राहक / नग
+            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
+    cell: ({ row }) => {
+      const customerName = row.original?.user?.name;
+      const itemName = row.original?.item?.name;
+      const totalItem = row.original?.totalItem;
+      return <>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</>;
+    },
   },
+  // {
+  //   accessorKey: "name",
+  //   header: ({ column }) => {
+  //       return (
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           नाम
+  //           <ArrowUpDown className="ml-1 h-2 w-2" />
+  //         </Button>
+  //       )
+  //   }
+  // },
+  // {
+  //   accessorKey: "totalItem",
+  //   header: ({ column }) => {
+  //       return (
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           नग
+  //           <ArrowUpDown className="ml-1 h-2 w-2" />
+  //         </Button>
+  //       )
+  //   },
+  // },
   {
-    accessorKey: "name",
+    accessorKey: "returnCount",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
           >
-            नाम
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            वापस
+            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
-  },
-  {
-    accessorKey: "totalItem",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            नग
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
+    size: 50,
+    maxSize: 50,
+    cell: ({ row }) => {
+      const returnCount = row.original?.returnCount;
+      return <div className="text-center text-purple-800">{returnCount}</div>
     },
   },
   {
@@ -61,38 +96,14 @@ export const columns: ColumnDef<Entry>[] = [
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            जमा
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            रू जमा
+            <ArrowUpDown className="ml-1 h-2 w-2" />
           </Button>
         )
     },
-  },
-  {
-    accessorKey: "due",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            बकाया 
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-    },
-  },
-  {
-    accessorKey: "value",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            कुल 
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
+    cell: ({ row }) => {
+      const cash = row.original?.cash;
+      return <div className="text-center text-green-700">{cash}</div>
     },
   },
   {
@@ -104,9 +115,51 @@ export const columns: ColumnDef<Entry>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             तारीख 
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-1 h-2 w-2" />
           </Button>
         )
     },
-  }
+    cell: ({ row }) => {
+      let dateStr='';
+      let timeStr='';
+      let dateObj=new Date(row.getValue('createdAt'))
+      dateStr=dateObj.getDate()+'-'+(dateObj.getMonth()+1);
+      
+      if(dateObj.getHours()>12){
+        timeStr=dateObj.getHours()+':'+dateObj.getMinutes()+' शाम';
+      }
+      else{
+        timeStr=dateObj.getHours()+':'+dateObj.getMinutes()+' सुबह';
+      }
+      return <>{dateStr}<br/>{timeStr}</>;
+    }
+  },
+  // {
+  //   accessorKey: "due",
+  //   header: ({ column }) => {
+  //       return (
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           बकाया 
+  //           <ArrowUpDown className="ml-1 h-2 w-2" />
+  //         </Button>
+  //       )
+  //   },
+  // },
+  {
+    accessorKey: "value",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            कुल रू
+            <ArrowUpDown className="ml-1 h-2 w-2" />
+          </Button>
+        )
+    },
+  },
 ]

@@ -72,6 +72,9 @@ export const getEntries = async (page:number) => {
             include: {
                 item: true,
                 user: true,
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         })
         return res
@@ -84,18 +87,23 @@ export const getEntries = async (page:number) => {
 export const getUserEntries = async (userId:number) => {
     try {
         const res = await db.entry.findMany({
+            take: 50,
             where: {
                 userId: userId
             },
             include: {
                 item: true,
                 user: true,
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         })
         return res
     }
     catch (e) {
         console.log(e)
+        return null;
     }
 }
 
@@ -110,6 +118,7 @@ export const getEntry = async (id:number) => {
     }
     catch (e) {
         console.log(e)
+        return null;
     }
 }
 
