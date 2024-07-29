@@ -35,7 +35,7 @@ export const columns: ColumnDef<Entries>[] = [
     cell: ({ row }) => {
       const customerName = row.original?.user?.name;
       const itemName = row.original?.item?.name;
-      const totalItem = row.original?.totalItem;
+      const totalItem = row.original?.totalItem - row.original?.returnCount;
       return <>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</>;
     },
   },
@@ -68,7 +68,7 @@ export const columns: ColumnDef<Entries>[] = [
   //   },
   // },
   {
-    accessorKey: "returnCount",
+    accessorKey: "cash",
     header: ({ column }) => {
         return (
           <Button
@@ -76,28 +76,8 @@ export const columns: ColumnDef<Entries>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             size="sm"
           >
-            वापस
-            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
-          </Button>
-        )
-    },
-    size: 50,
-    maxSize: 50,
-    cell: ({ row }) => {
-      const returnCount = row.original?.returnCount;
-      return <div className="text-center text-purple-800">{returnCount}</div>
-    },
-  },
-  {
-    accessorKey: "cash",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
             रू जमा
-            <ArrowUpDown className="ml-1 h-2 w-2" />
+            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
@@ -113,9 +93,10 @@ export const columns: ColumnDef<Entries>[] = [
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
           >
             तारीख 
-            <ArrowUpDown className="ml-1 h-2 w-2" />
+            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
@@ -126,7 +107,7 @@ export const columns: ColumnDef<Entries>[] = [
       dateStr=dateObj.getDate()+'-'+(dateObj.getMonth()+1);
       
       if(dateObj.getHours()>12){
-        timeStr=dateObj.getHours()+':'+dateObj.getMinutes()+' शाम';
+        timeStr=dateObj.getHours()-12+':'+dateObj.getMinutes()+' शाम';
       }
       else{
         timeStr=dateObj.getHours()+':'+dateObj.getMinutes()+' सुबह';
@@ -134,6 +115,7 @@ export const columns: ColumnDef<Entries>[] = [
       return <>{dateStr}<br/>{timeStr}</>;
     }
   },
+  
   // {
   //   accessorKey: "due",
   //   header: ({ column }) => {
@@ -155,11 +137,30 @@ export const columns: ColumnDef<Entries>[] = [
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
           >
             कुल रू
-            <ArrowUpDown className="ml-1 h-2 w-2" />
+            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
+    },
+  },
+  {
+    accessorKey: "returnCount",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
+          >
+            वापस
+          </Button>
+        )
+    },
+    cell: ({ row }) => {
+      const returnCount = row.original?.returnCount;
+      return <div className="text-center text-rose-600">{returnCount}</div>
     },
   },
 ]
