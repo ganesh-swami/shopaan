@@ -1,8 +1,10 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Sunrise, IndianRupee,Pencil } from "lucide-react"
+import { Sunrise, IndianRupee,Pencil,Check } from "lucide-react"
 import Router from 'next/router'
+import { updateEntry} from "@/lib/queries"
+import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
 
 // This type is used to define the shape of our data.
@@ -18,6 +20,30 @@ import { Button } from "../ui/button"
 const handleEdit =(entryId:number,userId:number)=>{
   //Router.push(`/admin/entry/edit/${entryId}/${userId}`)
   window.location.replace(`/admin/entry/edit/${entryId}/${userId}`)
+}
+
+type rowEntry={
+  id:number,
+  cash:number,
+  value:number,
+  userId:number,
+  totalItem:number,
+  returnCount:number,
+}
+
+const handleComplete= async (row:rowEntry)=>{
+  let remainingAmount= row.value-row.cash;
+  if(confirm(`${remainingAmount} रु बकाया राशि जमा ?`)){
+
+    console.log('complete');
+    const finalData={
+      cash:row.value,
+      status:'DONE'
+    }
+    //@ts-ignore
+    await updateEntry(row.id, finalData);
+    window.location.reload();
+  }
 }
 
 export const columns: ColumnDef<any>[] = [
@@ -38,7 +64,9 @@ export const columns: ColumnDef<any>[] = [
       const customerName = row.original?.user?.name;
       const itemName = row.original?.item?.name;
       const totalItem = row.original?.totalItem - row.original?.returnCount;
-      return <>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</>;
+      const cls= row.original.value-row.original.cash===0 ? true :false;
+
+      return <div className={cls ? "text-slate-400" :"text-black"}>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</div>;
     },
   },
   {
@@ -56,7 +84,8 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const cash = row.original?.cash;
-      return <div className="text-center text-green-700">{cash}</div>
+      const cls= row.original.value-row.original.cash===0 ? 'text-green-400' :'text-green-700';
+      return <div className={`text-center ${cls}`}>{cash}</div>
     },
   },
   {
@@ -85,7 +114,9 @@ export const columns: ColumnDef<any>[] = [
       else{
         timeStr=dateObj.getHours()+':'+dateObj.getMinutes();
       }
-      return <div className="text-center">{dateStr}<br/><div className="flex text-xs justify-evenly items-center text-blue-600">{isSunrise ? <IndianRupee size={16} /> : null} {" "+row.original?.value}</div></div>;
+      const cls= row.original.value-row.original.cash===0 ? 'text-slate-400' :'text-black';
+      const cls2= row.original.value-row.original.cash===0 ? 'text-blue-400' :'text-blue-700';
+      return <div className={`text-center ${cls}`}>{dateStr}<br/><div className={`flex text-xs justify-evenly items-center ${cls2}`}>{isSunrise ? <IndianRupee size={16} /> : null} {" "+row.original?.value}</div></div>;
     }
     
   },
@@ -104,9 +135,10 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const userId = row.original?.user.id;
-      return (<div className="text-center">
+      const showBtn= row.original.value-row.original.cash===0 ?false : true;
+      return (showBtn && <div className="text-center">
         <Button onClick={()=>{handleEdit(userId,row.original.id)}} variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
-        <Button variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
+        <Button onClick={()=>{handleComplete(row.original)}} variant="outline" size="sm"><Check size={16} strokeWidth={3} /></Button>
       </div>)
     },
   },
