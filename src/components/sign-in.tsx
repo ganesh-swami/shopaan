@@ -6,7 +6,7 @@ export function SignIn() {
     <form
       action={async () => {
         "use server"
-        await signIn("google",{redirectTo:"/admin/sellManager"});
+        await signIn("google",{redirectTo:"/admin/user"});
       }}
     >
       <button type="submit">Signin with Google</button>

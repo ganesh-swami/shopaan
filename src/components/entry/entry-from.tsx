@@ -2,6 +2,7 @@
 
 import { useEffect,useState } from 'react';
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,10 @@ export function EntryForm(props:{userId:number, id?:number}) {
   const [items,setItems]= useState<Item[]>();
   const [user,setUser]= useState<User>();
   const [isSaving,setIsSaving]=useState<boolean>();
+
+  const router = useRouter();
+
+
 
   const defaultValues = {
     userId:0,
@@ -162,6 +167,7 @@ export function EntryForm(props:{userId:number, id?:number}) {
         console.log('resp', resp);
         if(resp) {
           toast.success("Entry updated successfully");
+          router.push(`/admin/entry?userid=${userId}`);
         }
         else {
           toast.error("Error in updating");
@@ -172,7 +178,10 @@ export function EntryForm(props:{userId:number, id?:number}) {
         //@ts-ignore
         const resp = await createEntry(finalData);
         console.log('resp', resp);
-        if(resp) {toast.success("Entry created successfully");}
+        if(resp) {
+          toast.success("Entry created successfully");
+          router.push(`/admin/entry?userid=${userId}`);
+        }
         else {
           toast.error("Error in creating");
           setIsSaving(false);
