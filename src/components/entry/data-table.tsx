@@ -38,7 +38,7 @@ export function DataTable<TData, TValue>({
   const handleClick = (id:number)=>{
     // console.log(`/admin/user/${id}/edit`);
     
-    router.push(`/admin/user/${id}/edit`);
+    //router.push(`/admin/user/${id}/edit`);
   }
 
   return (

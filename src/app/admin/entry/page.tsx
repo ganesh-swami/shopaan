@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 
 
 export default function Entries () {
+
+    const [customerName,setCustomerName]= useState<string>();
     const router = useRouter();
     
     const searchParams = useSearchParams()
@@ -33,7 +35,12 @@ export default function Entries () {
         const fetchUsers = async () => {
             if(userid && userid!==''){
                 const entries = await getUserEntries(parseInt(userid));
-                if(entries && entries.length>0) setEntries(entries);
+                if(entries && entries.length>0) {
+                    setEntries(entries);
+                    //@ts-ignore
+                    setCustomerName(entries[0].user?.name);
+                }
+
             }
             else{
                 let curentPage = page ? parseInt(page) : 1;
@@ -54,11 +61,10 @@ export default function Entries () {
     return (
         <div className="flex flex-col items-center w-full py-4">
             <div className="flex flex-row w-full items-center justify-around">
-                <h1 className="py-4"> ग्राहक </h1>
-                <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button>
+               <h1 className="py-4">{customerName ? customerName : 'ग्राहक' }</h1>
+                { userid && <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button> }
             </div>
             <DataTable columns={columns} data={entry} />
-
         </div>
     )
 }
