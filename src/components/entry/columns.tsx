@@ -1,23 +1,26 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import {Entry,User, Item} from '@prisma/client'
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { Sunrise, IndianRupee,Pencil } from "lucide-react"
+import Router from 'next/router'
 import { Button } from "../ui/button"
-import { Interface } from "readline"
-
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-interface Entries extends Entry {
-  user: User,
-  item: Item
+// interface Entries extends Entry {
+//   user: User,
+//   item: Item
+// }
+
+// console.log('interface ',Entries)
+
+const handleEdit =(entryId:number,userId:number)=>{
+  //Router.push(`/admin/entry/edit/${entryId}/${userId}`)
+  window.location.replace(`/admin/entry/edit/${entryId}/${userId}`)
 }
 
-
-
-export const columns: ColumnDef<Entries>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "customerName",
     header: ({ column }) => {
@@ -28,7 +31,6 @@ export const columns: ColumnDef<Entries>[] = [
             size="sm"
           >
             ग्राहक / नग
-            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
@@ -39,34 +41,6 @@ export const columns: ColumnDef<Entries>[] = [
       return <>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</>;
     },
   },
-  // {
-  //   accessorKey: "name",
-  //   header: ({ column }) => {
-  //       return (
-  //         <Button
-  //           variant="ghost"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           नाम
-  //           <ArrowUpDown className="ml-1 h-2 w-2" />
-  //         </Button>
-  //       )
-  //   }
-  // },
-  // {
-  //   accessorKey: "totalItem",
-  //   header: ({ column }) => {
-  //       return (
-  //         <Button
-  //           variant="ghost"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           नग
-  //           <ArrowUpDown className="ml-1 h-2 w-2" />
-  //         </Button>
-  //       )
-  //   },
-  // },
   {
     accessorKey: "cash",
     header: ({ column }) => {
@@ -77,7 +51,6 @@ export const columns: ColumnDef<Entries>[] = [
             size="sm"
           >
             रू जमा
-            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
@@ -96,7 +69,6 @@ export const columns: ColumnDef<Entries>[] = [
             size="sm"
           >
             तारीख 
-            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
           </Button>
         )
     },
@@ -105,33 +77,20 @@ export const columns: ColumnDef<Entries>[] = [
       let timeStr='';
       let dateObj=new Date(row.getValue('createdAt'))
       dateStr=dateObj.getDate()+'-'+(dateObj.getMonth()+1);
-      
+      let isSunrise=false;
       if(dateObj.getHours()>12){
-        timeStr=dateObj.getHours()-12+':'+dateObj.getMinutes()+' शाम';
+        timeStr=dateObj.getHours()-12+':'+dateObj.getMinutes();
+        isSunrise=true;
       }
       else{
-        timeStr=dateObj.getHours()+':'+dateObj.getMinutes()+' सुबह';
+        timeStr=dateObj.getHours()+':'+dateObj.getMinutes();
       }
-      return <>{dateStr}<br/>{timeStr}</>;
+      return <div className="text-center">{dateStr}<br/><div className="flex text-xs justify-evenly items-center text-blue-600">{isSunrise ? <IndianRupee size={16} /> : null} {" "+row.original?.value}</div></div>;
     }
+    
   },
-  
-  // {
-  //   accessorKey: "due",
-  //   header: ({ column }) => {
-  //       return (
-  //         <Button
-  //           variant="ghost"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           बकाया 
-  //           <ArrowUpDown className="ml-1 h-2 w-2" />
-  //         </Button>
-  //       )
-  //   },
-  // },
   {
-    accessorKey: "value",
+    accessorKey: "returnCount",
     header: ({ column }) => {
         return (
           <Button
@@ -139,10 +98,16 @@ export const columns: ColumnDef<Entries>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             size="sm"
           >
-            कुल रू
-            {/* <ArrowUpDown className="ml-1 h-2 w-2" /> */}
+            कार्य
           </Button>
         )
+    },
+    cell: ({ row }) => {
+      const userId = row.original?.user.id;
+      return (<div className="text-center">
+        <Button onClick={()=>{handleEdit(userId,row.original.id)}} variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
+        <Button variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
+      </div>)
     },
   },
   {
@@ -163,4 +128,31 @@ export const columns: ColumnDef<Entries>[] = [
       return <div className="text-center text-rose-600">{returnCount}</div>
     },
   },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            size="sm"
+          >
+            समय
+          </Button>
+        )
+    },
+    cell: ({ row }) => {
+      let timeStr='';
+      let dateObj=new Date(row.getValue('createdAt'))
+      let isSunrise=true;
+      if(dateObj.getHours()>12){
+        timeStr=dateObj.getHours()-12+':'+dateObj.getMinutes();
+        isSunrise=false;
+      }
+      else{
+        timeStr=dateObj.getHours()+':'+dateObj.getMinutes();
+      }
+      return <div className="text-center"><div className="flex text-xs justify-evenly text-slate-400">{isSunrise ? <Sunrise size={16} /> : null} {" "+timeStr}</div></div>;
+    }
+  },  
 ]

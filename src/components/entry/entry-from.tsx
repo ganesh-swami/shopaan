@@ -88,7 +88,7 @@ export function EntryForm(props:{userId:number, id?:number}) {
             if(response){
                 setItems(response.items);
                 setUser(response.user);
-                form.setValue('itemId',response.items[0].id);
+                
 
                 if(response.entry){
                     const {
@@ -102,12 +102,13 @@ export function EntryForm(props:{userId:number, id?:number}) {
                     form.reset({
                       userId: userId,
                       itemId: itemId || 0,
-                      totalItem: totalItem || 0,
-                      returnCount: returnCount || 0,
-                      value: value || 0,
-                      cash: cash || 0,
+                      totalItem: totalItem+'' || '0',
+                      returnCount: returnCount+'' || '0',
+                      value: value+'' || '0',
+                      cash: cash+'' || '0',
                       pickedBy: pickedBy || ''
                     });
+                    form.setValue('itemId',itemId);
                     // defaultValues.itemId= itemId ? itemId :0;
                     // defaultValues.totalItem= totalItem ? totalItem :0;
                     // defaultValues.returnCount= returnCount ? returnCount :0;
@@ -115,6 +116,9 @@ export function EntryForm(props:{userId:number, id?:number}) {
                     // defaultValues.cash= cash ? cash :0;
                     // defaultValues.pickedBy= pickedBy ? pickedBy :'';
                     // form.reset(defaultValues);
+                }
+                else{
+                  form.setValue('itemId',response.items[0].id);
                 }
 
             }
@@ -128,10 +132,6 @@ export function EntryForm(props:{userId:number, id?:number}) {
     }
 },[userId,id]);
 
-useEffect(()=>{
-    console.log("items : ", items);
-    console.log("user : ", user);
-},[items,user])
 
 
   // 2. Define a submit handler.
@@ -140,7 +140,8 @@ useEffect(()=>{
     console.log("values : ",values);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-
+    
+    
     const finalData ={
         ...values,
         itemId:parseInt(values.itemId+""),
@@ -148,6 +149,11 @@ useEffect(()=>{
         returnCount:parseInt(values.returnCount+""),
         value:parseInt(values.value+""),
         cash:parseInt(values.cash+""),
+        status:"ACTIVE"
+    }
+
+    if(values.value==values.cash || parseInt(values.totalItem)-parseInt(values.returnCount)==0){
+      finalData["status"]='DONE';
     }
     
     if(id){
@@ -182,6 +188,13 @@ useEffect(()=>{
     form.setValue('totalItem', e.target.value);
     updateValue()
   }
+
+  const returnUpdateValue=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    form.setValue('returnCount', e.target.value);
+    updateValue()
+  }
+
+  
   const updateValue =()=>{
     
     const totalItem = parseInt(form.getValues('totalItem'));
@@ -192,10 +205,11 @@ useEffect(()=>{
       // form.setValue('itemId', itemId);
     }
     console.log('totalItem', totalItem, 'returnCount', returnCount, 'itemId', itemId);
-    if(totalItem && returnCount>=0 && itemId){
+    if(totalItem>=0 && returnCount>=0 && itemId){
         const remainingItem = totalItem - returnCount;
         const item = items?.find((item)=>item.id == itemId);
         if(item){
+            console.log('remainingItem',remainingItem);
             const value = remainingItem * item.price;
             console.log('value',value);
             form.setValue('value', value+"");
@@ -208,7 +222,13 @@ useEffect(()=>{
     <div className="flex flex-col items-center py-4">
         { items && items.length>0 && user && user.name ?
         <>
-          <h1 className="py-4"> {user.name} </h1>
+          <div className="flex flex-col items-center mt-4">
+            <h1 className=""> {user.name +" "+user.cast} </h1>
+            <p className='text-sm text-slate-500 pb-2'>{user.village +" "+user.address}</p>
+            
+          </div>
+          <hr className='h-2 w-full  mb-4'></hr>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
@@ -217,11 +237,12 @@ useEffect(()=>{
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <RadioGroup defaultValue={items[0].id ? items[0].id+'': undefined} onValueChange={(e)=>{itemUpdateValue(e)}}>
+                      {/* defaultValue={items[0].id ? items[0].id+'': undefined} */}
+                      <RadioGroup  onValueChange={(e)=>{itemUpdateValue(e)}}> 
                         {items.map((item)=>{
                           return (
                           <div key={item.id} className="flex items-center space-x-2">
-                            <RadioGroupItem value={item.id+""} id={item.id+""} />
+                            <RadioGroupItem value={item.id+""} checked={form.getValues('itemId')==item.id} id={item.id+""} />
                             <Label htmlFor={item.name}>{item.name}</Label>
                           </div>
                           );
@@ -239,7 +260,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>नग</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Enter total items" {...field} onChange={(e)=>{countUpdateValue(e)}}/>
+                      <Input type="number" min={0} placeholder="Enter total items" {...field} onChange={(e)=>{countUpdateValue(e)}}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -253,7 +274,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>वापस </FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Enter return count" {...field} />
+                      <Input type="number" min={0} placeholder="Enter return count" {...field} onChange={(e)=>{returnUpdateValue(e)}}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,7 +288,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>रूपए</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Enter value" {...field} />
+                      <Input type="number" min={0} placeholder="Enter value" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -280,7 +301,7 @@ useEffect(()=>{
                   <FormItem>
                     <FormLabel>जमा</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Enter cash" {...field} />
+                      <Input type="number" min={0} placeholder="Enter cash" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
