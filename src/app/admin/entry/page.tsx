@@ -61,7 +61,7 @@ export default function Entries () {
     return (
         <div className="flex flex-col items-center w-full py-4">
             <div className="flex flex-row w-full items-center justify-around">
-               <h1 className="py-4">{customerName ? customerName : 'ग्राहक' }</h1>
+               <h1 className="py-4">{customerName ? customerName+' की एंट्री' : 'सभी एंट्री ' }</h1>
                 { userid && <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button> }
             </div>
             <DataTable columns={columns} data={entry} />

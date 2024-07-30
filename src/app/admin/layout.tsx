@@ -4,6 +4,7 @@ import { useSession, SessionProvider } from 'next-auth/react';
 import { Toaster } from "@/components/ui/sonner"
 import AuthChecker from "./authchecker";
 import "./../globals.css";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,12 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="container max-w-7xl mx-auto py-4 px-2">
-        <SessionProvider>
-            <AuthChecker>
-            {children}
-            </AuthChecker>
-        </SessionProvider>  
+        <div className="main">
+          <SessionProvider>
+              <AuthChecker>
+                <Header />
+                <div className="max-w-7xl mx-auto py-4 px-2">
+                {children}
+                </div>
+              </AuthChecker>
+          </SessionProvider>  
         </div>  
         <Toaster richColors position="top-right" />
     </body>

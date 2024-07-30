@@ -64,9 +64,10 @@ export const columns: ColumnDef<any>[] = [
       const customerName = row.original?.user?.name;
       const itemName = row.original?.item?.name;
       const totalItem = row.original?.totalItem - row.original?.returnCount;
-      const cls= row.original.value-row.original.cash===0 ? true :false;
-
-      return <div className={cls ? "text-slate-400" :"text-black"}>{customerName}<br/> <b>{totalItem}</b> {"  "+itemName}</div>;
+      const Completed=row.original.status==='DONE' ? true :false;
+      const returnedHtml = row.original?.returnCount > 0 ? <s className="text-sm text-red-400">{row.original?.totalItem}</s> : null;
+      const html = Completed ? <s><b className="pl-1">{totalItem}</b> {"  "+itemName}</s> :  <><b className="pl-1">{totalItem}</b> {"  "+itemName}</>
+      return <div className={Completed ? "text-slate-400" :"text-black"}>{customerName}<br/> {returnedHtml}{html}</div>;
     },
   },
   {
@@ -84,8 +85,11 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const cash = row.original?.cash;
-      const cls= row.original.value-row.original.cash===0 ? 'text-green-400' :'text-green-700';
-      return <div className={`text-center ${cls}`}>{cash}</div>
+      const cls= row.original.status==='DONE' ? 'text-green-400' :'text-green-700';
+      return <div className={`text-center ${cls}`}>{cash}
+      <br/>
+      <Button onClick={()=>{handleComplete(row.original)}} variant="outline" className="mt-1 text-black" size="sm"><Check size={16} strokeWidth={3} /></Button>
+      </div>
     },
   },
   {
@@ -114,9 +118,10 @@ export const columns: ColumnDef<any>[] = [
       else{
         timeStr=dateObj.getHours()+':'+dateObj.getMinutes();
       }
-      const cls= row.original.value-row.original.cash===0 ? 'text-slate-400' :'text-black';
-      const cls2= row.original.value-row.original.cash===0 ? 'text-blue-400' :'text-blue-700';
-      return <div className={`text-center ${cls}`}>{dateStr}<br/><div className={`flex text-xs justify-evenly items-center ${cls2}`}>{isSunrise ? <IndianRupee size={16} /> : null} {" "+row.original?.value}</div></div>;
+      const remainingAmount = parseInt(row.original.value)-parseInt(row.original.cash);
+      const cls= row.original.status==='DONE' ? 'text-slate-400' :'text-black';
+      const cls2= row.original.status==='DONE' ? 'text-red-400' :'text-red-700';
+      return <div className={`text-center ${cls}`}>{dateStr}<br/><div className={`flex text-xs justify-evenly items-center ${cls2}`}>{isSunrise ? <IndianRupee size={16} /> : null} {" "+remainingAmount}</div></div>;
     }
     
   },
@@ -135,11 +140,13 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const userId = row.original?.user.id;
-      const showBtn= row.original.value-row.original.cash===0 ?false : true;
-      return (showBtn && <div className="text-center">
+      // const showBtn= row.original.status==='DONE' ?false : true;
+      return (
+        <div className="text-center">
         <Button onClick={()=>{handleEdit(userId,row.original.id)}} variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
-        <Button onClick={()=>{handleComplete(row.original)}} variant="outline" size="sm"><Check size={16} strokeWidth={3} /></Button>
-      </div>)
+        {/* <Button onClick={()=>{handleComplete(row.original)}} variant="outline" size="sm"><Check size={16} strokeWidth={3} /></Button> */}
+      </div>
+    )
     },
   },
   {
