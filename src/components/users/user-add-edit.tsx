@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import {getUser,createUser,updateUser} from "@/lib/queries";
 import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
 //   id: z.string().optional().or(z.literal('')),
@@ -46,6 +47,8 @@ const formSchema = z.object({
 })
 
 export default function UserForm(props:{id?:number}) {
+
+    const router = useRouter();
     // const [isloading,setL]
     const {id} = props;
     const defaultValues = { 
@@ -78,6 +81,9 @@ export default function UserForm(props:{id?:number}) {
         else{
             //@ts-ignore
             const response = await createUser(values);
+            if(response && response.id){
+                router.push(`/entry?userid=${response.id}`);
+            }
         }
       }
 
