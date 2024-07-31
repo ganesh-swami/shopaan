@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { boolean, z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
 import {getUser,createUser,updateUser} from "@/lib/queries";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import MyLoader from "@/components/ui/loader"
 
 const formSchema = z.object({
 //   id: z.string().optional().or(z.literal('')),
@@ -48,6 +49,8 @@ const formSchema = z.object({
 
 export default function UserForm(props:{id?:number}) {
 
+    const [isSaving,setIsSaving]=useState<boolean>(false);
+
     const router = useRouter();
     // const [isloading,setL]
     const {id} = props;
@@ -70,13 +73,17 @@ export default function UserForm(props:{id?:number}) {
      
       // 2. Define a submit handler.
       async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSaving(true);
         console.log("values : ",values);
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
 
         if(id){
             //@ts-ignore
-            await updateUser(id,values);
+            const response = await updateUser(id,values);
+            if(response && response.id){
+                router.push(`/entry?userid=${response.id}`);
+            }
         }
         else{
             //@ts-ignore
@@ -85,6 +92,7 @@ export default function UserForm(props:{id?:number}) {
                 router.push(`/entry?userid=${response.id}`);
             }
         }
+        setIsSaving(false);
       }
 
     useEffect(()=>{
@@ -257,7 +265,7 @@ export default function UserForm(props:{id?:number}) {
             )}
             />
 
-            <Button type="submit" size="lg">जोड़े</Button>
+            <Button type="submit" size="lg">{isSaving ? <MyLoader size='sm'/> : 'जोड़े'}</Button>
         </form>
         </Form>
     </div>
