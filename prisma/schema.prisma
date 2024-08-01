@@ -20,7 +20,7 @@ model User {
   cast       String
   address    String?
   village    String?
-  phone      Int?
+  phone      BigInt?
   fatherName String?
   neighbour  String?
   rating     Int?
