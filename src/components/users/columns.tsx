@@ -57,7 +57,7 @@ export const columns: ColumnDef<User>[] = [
       // const showBtn= row.original.status==='DONE' ?false : true;
       return (
         <div className="text-center flex">
-        <Button onClick={()=>{handleView(userId)}} variant="outline" className="text-green-700"><View size={24} strokeWidth={1} /></Button>
+        <Button onClick={()=>{handleView(userId)}} variant="outline" className="text-green-700 w-10" size={"sm"}><View size={24} strokeWidth={2} /></Button>
       </div>
     )
     },
@@ -87,12 +87,33 @@ export const columns: ColumnDef<User>[] = [
   },
 
   {
+    accessorKey: "extra",
+    header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            और जानकारी 
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+    },
+    cell: ({ row }) => {
+      const neighbour = row.original.neighbour;
+      const extra = row.original.extra;
+      const ratting = row.original.rating;
+      return <div className="flex flex-col"><div className="text-slate-500 text-sm">{neighbour}</div><div className="text-slate-800"> {extra} </div> <div className="text-sm text-blue-600 text-xs">{ratting ? ratting : null}</div></div>
+    }
+
+    
+  },
+  {
     accessorKey: "village",
     header: ({ column }) => {
         return (
           <Button
             variant="ghost"
-            //onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             चेंज
             <ArrowUpDown className="ml-2 h-4 w-4" />
