@@ -42,13 +42,6 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  const router = useRouter()
-
-  // const handleClick = (id:number)=>{
-  //   // console.log(`/admin/user/${id}/edit`);
-    
-  //   router.push(`/admin/entry?userid=${id}`);
-  // }
 
   return (
     <div className="rounded-md border-2 w-full">
