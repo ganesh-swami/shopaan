@@ -82,14 +82,14 @@ export default function UserForm(props:{id?:number}) {
             //@ts-ignore
             const response = await updateUser(id,values);
             if(response && response.id){
-                router.push(`/entry?userid=${response.id}`);
+                router.push(`/admin/entry?userid=${response.id}`);
             }
         }
         else{
             //@ts-ignore
             const response = await createUser(values);
             if(response && response.id){
-                router.push(`/entry?userid=${response.id}`);
+                router.push(`/admin/entry?userid=${response.id}`);
             }
         }
         setIsSaving(false);
