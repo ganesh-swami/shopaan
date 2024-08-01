@@ -1,11 +1,13 @@
 "use client"
-
+import React from 'react';
 import { useRouter } from 'next/navigation'
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -27,19 +29,26 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
 
+  const [sorting, setSorting] = React.useState<SortingState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   })
 
   const router = useRouter()
 
-  const handleClick = (id:number)=>{
-    // console.log(`/admin/user/${id}/edit`);
+  // const handleClick = (id:number)=>{
+  //   // console.log(`/admin/user/${id}/edit`);
     
-    router.push(`/admin/user/${id}/edit`);
-  }
+  //   router.push(`/admin/entry?userid=${id}`);
+  // }
 
   return (
     <div className="rounded-md border-2 w-full">
@@ -68,11 +77,6 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onClick={(e) => {
-                    e.preventDefault();
-                    //@ts-ignore
-                    handleClick(row.original.id);
-                }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

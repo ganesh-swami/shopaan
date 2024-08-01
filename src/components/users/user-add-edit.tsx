@@ -32,16 +32,16 @@ const formSchema = z.object({
   village:z.string().min(3, {
     message: "village must be at least 3 characters.",
   }).optional().or(z.literal('')),
-  phone: z.number().min(10).max(10).optional().or(z.literal(0)),
+  phone: z.string().min(10).max(10).optional().or(z.literal('0')),
   fatherName:z.string().min(3, {
     message: "fatherName must be at least 3 characters.",
   }).optional().or(z.literal('')),
   neighbour:z.string().min(3, {
     message: "neighbour must be at least 3 characters.",
   }).optional().or(z.literal('')),
-  rating:z.number().min(-1, {
+  rating:z.string().min(0, {
     message: "rating must be at least 1 characters.",
-  }).max(9).optional().or(z.literal('')),
+  }).max(1).optional().or(z.literal('')),
   extra:z.string().min(3, {
     message: "extra must be at least 3 characters.",
   }).optional().or(z.literal('')),
@@ -59,10 +59,10 @@ export default function UserForm(props:{id?:number}) {
         cast:"",
         address:"",
         village:"",
-        phone:0,
+        phone:'',
         fatherName:"",
         neighbour:"",
-        rating:0,
+        rating:'0',
         extra:""
     }
 
@@ -74,20 +74,22 @@ export default function UserForm(props:{id?:number}) {
       // 2. Define a submit handler.
       async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSaving(true);
-        console.log("values : ",values);
+        // console.log("values : ",values);
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
+        const phone = values.phone && values.phone!='' ? parseInt(values.phone+"") : 0;
+        const rating = values.rating && values.rating!='' ? parseInt(values.rating+"") : 0;
 
         if(id){
             //@ts-ignore
-            const response = await updateUser(id,values);
+            const response = await updateUser(id,{...values,phone,rating});
             if(response && response.id){
                 router.push(`/admin/entry?userid=${response.id}`);
             }
         }
         else{
             //@ts-ignore
-            const response = await createUser(values);
+            const response = await createUser({...values,phone,rating});
             if(response && response.id){
                 router.push(`/admin/entry?userid=${response.id}`);
             }
@@ -118,11 +120,11 @@ export default function UserForm(props:{id?:number}) {
                         defaultValues.cast= cast ? cast :'';
                         defaultValues.address= address ? address :'';
                         defaultValues.village= village ? village :'';
-                        defaultValues.phone= phone ? phone : 0;
+                        defaultValues.phone= phone ? phone+'' : '0';
                         defaultValues.fatherName= fatherName ? fatherName :'';
                         defaultValues.neighbour= neighbour ? neighbour :'';
                         //@ts-ignore
-                        defaultValues.rating= rating ? rating :0;
+                        defaultValues.rating= rating ? rating+'' :'';
                         defaultValues.extra= extra ? extra :'';
                         form.reset(defaultValues);
                     }
