@@ -20,7 +20,7 @@ export default function Entries ({ params, searchParams}:Props) {
             <h1 className="text-2xl font-bold">Add Entry</h1>
             <>
             <EntryForm userId={parseInt(userid)} id={parseInt(id)}/>
-            <Button onClick={() => router.push('/admin/entries')} className="mt-4"> Back</Button>
+            {/* <Button onClick={() => router.push('/admin/entry')} className="mt-4"> Back</Button> */}
             </>
         </div>
     )

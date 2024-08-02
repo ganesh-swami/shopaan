@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation'
-import {getEntries,getUserEntries} from "@/lib/queries";
+import {getUser,getEntries,getUserEntries} from "@/lib/queries";
 import {
     Entry,
     User,
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Entries () {
 
-    const [customerName,setCustomerName]= useState<string>();
+    const [customer,setCustomer]= useState<User>();
     const router = useRouter();
     
     const searchParams = useSearchParams()
@@ -38,7 +38,12 @@ export default function Entries () {
                 if(entries && entries.length>0) {
                     setEntries(entries);
                     //@ts-ignore
-                    setCustomerName(entries[0].user?.name);
+                    setCustomer(entries[0].user);
+                }
+                else{
+
+                    const custmr = await getUser(parseInt(userid));
+                    if(custmr) setCustomer(custmr );
                 }
 
             }
@@ -53,16 +58,28 @@ export default function Entries () {
 
     },[page,userid])
 
-    const handleClick =()=>{
+    const handleClick =(userid:string)=>{
         console.log("clicked")
-        router.push('/admin/entry/add');
+        router.push(`/admin/entry/add/${userid}/`);
     }
    
     return (
-        <div className="flex flex-col items-center w-full py-4">
-            <div className="flex flex-row w-full items-center justify-around">
-               <h1 className="py-4">{customerName ? customerName+' की एंट्री' : 'सभी एंट्री ' }</h1>
-                { userid && <Button size="sm" onClick={()=>handleClick()}> + जोड़े </Button> }
+        <div className="flex flex-col items-center w-full pb-4">
+            <div className="flex flex-col w-full justify-around pb-2">
+               
+
+               {customer && 
+                    <div className="flex flex-col items-center mt-4">
+                        <h1 className=""> {customer.name +" "+customer.cast} {customer.fatherName ? "S/O "+ customer.fatherName :null} </h1>
+                        {customer.village && <p className='text-sm text-slate-400'>{"गाँव : "+ customer.village}</p>}
+                        {(customer.address || customer.neighbour) && <p className='text-sm text-slate-700'>{"पता : "+ customer.address  +", "+customer.neighbour}</p> }
+                        {customer.extra && <p className='text-sm text-slate-700'>{customer.extra}</p>}
+                    </div> 
+                }
+                <div className="flex flex-row justify-center w-full">
+                {<h1 className="">{!customer &&  'सभी एंट्री'}</h1> }
+                { userid && <Button className="mt-2 max-w-32" size="sm" onClick={()=>handleClick(userid)}> + एंट्री लिखे </Button> }
+                </div>
             </div>
             <DataTable columns={columns} data={entry} />
         </div>
