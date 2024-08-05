@@ -85,10 +85,12 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const cash = row.original?.cash;
+      const userId = row.original?.user.id;
       const cls= row.original.status==='DONE' ? 'text-green-400' :'text-green-700';
       return <div className={`text-center ${cls}`}>{cash}
       <br/>
-      <Button onClick={()=>{handleComplete(row.original)}} variant="outline" className="mt-1 text-black" size="sm"><Check size={16} strokeWidth={3} /></Button>
+      <Button onClick={()=>{handleEdit(userId,row.original.id)}} variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
+      
       </div>
     },
   },
@@ -139,12 +141,10 @@ export const columns: ColumnDef<any>[] = [
         )
     },
     cell: ({ row }) => {
-      const userId = row.original?.user.id;
-      // const showBtn= row.original.status==='DONE' ?false : true;
+      
       return (
         <div className="text-center">
-        <Button onClick={()=>{handleEdit(userId,row.original.id)}} variant="outline" size="sm"><Pencil size={16} strokeWidth={3} /></Button>
-        {/* <Button onClick={()=>{handleComplete(row.original)}} variant="outline" size="sm"><Check size={16} strokeWidth={3} /></Button> */}
+        <Button onClick={()=>{handleComplete(row.original)}} variant="outline" className="mt-1 text-black" size="sm"><Check size={16} strokeWidth={3} /></Button>
       </div>
     )
     },
